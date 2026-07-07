@@ -1,6 +1,9 @@
 # AskTheMap Web
 
-Next.js frontend with an interactive Leaflet map. Users click a location, type a question, and receive AI-generated answers grounded in satellite imagery.
+Next.js frontend with an interactive Leaflet map. Users click a location, type a
+question, and see a structured analysis (summary, confidence, supporting
+evidence, caveats) alongside the exact satellite tile the AI analyzed, so the
+answer can be visually verified rather than taken on faith.
 
 ## Setup
 

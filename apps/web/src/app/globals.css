@@ -121,38 +121,133 @@ body {
   cursor: not-allowed;
 }
 
-.answer-section {
+.analysis-panel {
   margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.image-preview {
+  border-radius: var(--radius);
+  border: 1px solid var(--panel-border);
+  overflow: hidden;
+}
+
+.image-preview-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.image-meta {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: #f7fafc;
+}
+
+.image-meta span {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.analysis-section {
   padding: 16px;
   background: #f7fafc;
   border-radius: var(--radius);
   border: 1px solid var(--panel-border);
 }
 
-.answer-section h3 {
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.analysis-header h3 {
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-secondary);
-  margin-bottom: 8px;
 }
 
-.answer-text {
+.confidence-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.confidence-high {
+  background: #f0fff4;
+  color: var(--success);
+  border: 1px solid #9ae6b4;
+}
+
+.confidence-medium {
+  background: #fffaf0;
+  color: #c05621;
+  border: 1px solid #fbd38d;
+}
+
+.confidence-low {
+  background: #fff5f5;
+  color: var(--error);
+  border: 1px solid #feb2b2;
+}
+
+.analysis-summary {
   font-size: 14px;
   line-height: 1.6;
-  white-space: pre-wrap;
 }
 
-.image-meta {
+.analysis-detail {
   margin-top: 12px;
-  font-size: 12px;
-  color: var(--text-secondary);
+  font-size: 13px;
 }
 
-.image-meta span {
-  display: block;
-  margin-bottom: 2px;
+.analysis-detail summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.analysis-detail p {
+  margin-top: 8px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.evidence-block,
+.caveats-block {
+  margin-top: 12px;
+}
+
+.evidence-block h4,
+.caveats-block h4 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.evidence-block ul,
+.caveats-block ul {
+  list-style: disc;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.caveats-block ul {
+  color: var(--text-secondary);
 }
 
 .error-msg {

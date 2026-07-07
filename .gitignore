@@ -7,11 +7,13 @@ build/
 .venv/
 venv/
 .env
+.env.local
 
 # Node
 node_modules/
 .next/
 out/
+*.tsbuildinfo
 
 # IDE
 .vscode/

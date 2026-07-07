@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from app.vlm.schemas import AnalysisResult
+
 
 class QueryRequest(BaseModel):
     lat: float = Field(..., ge=-90, le=90)
@@ -12,11 +14,15 @@ class ImageMetadata(BaseModel):
     cloud_cover: float | None = None
     collection: str
     asset_href: str
+    platform: str | None = None
+    instrument: str | None = None
+    resolution_m: float | None = None
 
 
 class QueryResponse(BaseModel):
-    answer: str
     lat: float
     lon: float
     question: str
-    image_metadata: ImageMetadata | None = None
+    analysis: AnalysisResult
+    image_metadata: ImageMetadata
+    image_base64: str = Field(..., description="PNG-encoded satellite tile that was analyzed, base64 without a data: prefix.")

@@ -14,14 +14,17 @@ AskTheMap makes geospatial intelligence accessible through natural language.
 2. Click any location on Earth
 3. Type a question (e.g., "What type of development is happening here?")
 4. The system retrieves recent Sentinel-2 satellite imagery for that location
-5. A Vision Language Model analyzes the imagery and answers your question
+5. A Vision Language Model analyzes the imagery and returns a structured
+   assessment — summary, confidence, supporting evidence, and caveats
+6. The app shows you the exact satellite tile that was analyzed alongside the
+   answer, so you can verify it yourself rather than take the AI's word for it
 
 ## Tech Stack
 
 - **Frontend:** Next.js + TypeScript + Leaflet
 - **Backend:** Python + FastAPI
 - **Satellite Data:** Microsoft Planetary Computer (Sentinel-2 L2A via STAC)
-- **AI:** Google Gemini Vision (provider-swappable)
+- **AI:** Google Gemini Vision (provider-swappable, structured JSON output)
 
 ## Quick Start
 
@@ -79,7 +82,7 @@ askthemap/
 
 ## Status
 
-In development — V1 MVP.
+In development — V2, Milestone 1 (trust & explainability) complete. See [roadmap](docs/roadmap.md).
 
 ## Creator
 

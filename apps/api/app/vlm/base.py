@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from PIL import Image
 
+from .schemas import AnalysisResult
+
 
 class BaseVLM(ABC):
     @abstractmethod
@@ -11,4 +13,4 @@ class BaseVLM(ABC):
         question: str,
         lat: float,
         lon: float,
-    ) -> str: ...
+    ) -> AnalysisResult: ...

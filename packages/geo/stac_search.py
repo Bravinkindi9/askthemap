@@ -10,10 +10,12 @@ def _search_sync(
     lon: float,
     max_cloud_cover: int = 30,
     stac_api_url: str = "https://planetarycomputer.microsoft.com/api/stac/v1",
+    timeout_s: float = 10.0,
 ) -> dict | None:
     catalog = pystac_client.Client.open(
         stac_api_url,
         modifier=planetary_computer.sign_inplace,
+        timeout=timeout_s,
     )
 
     now = datetime.now(timezone.utc)
@@ -38,11 +40,16 @@ def _search_sync(
     if visual_asset is None:
         return None
 
+    instruments = item.properties.get("instruments") or []
+
     return {
         "datetime": item.properties.get("datetime", ""),
         "cloud_cover": item.properties.get("eo:cloud_cover"),
         "collection": "sentinel-2-l2a",
         "asset_href": visual_asset.href,
+        "platform": item.properties.get("platform"),
+        "instrument": ", ".join(instruments) if instruments else None,
+        "resolution_m": visual_asset.extra_fields.get("gsd") or item.properties.get("gsd"),
     }
 
 
@@ -51,7 +58,8 @@ async def search_imagery(
     lon: float,
     max_cloud_cover: int = 30,
     stac_api_url: str = "https://planetarycomputer.microsoft.com/api/stac/v1",
+    timeout_s: float = 10.0,
 ) -> dict | None:
     return await asyncio.to_thread(
-        _search_sync, lat, lon, max_cloud_cover, stac_api_url
+        _search_sync, lat, lon, max_cloud_cover, stac_api_url, timeout_s
     )

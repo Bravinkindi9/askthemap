@@ -1,8 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import AnswerDisplay from "./AnswerDisplay";
+import { useEffect, useState } from "react";
+import AnalysisPanel from "./AnalysisPanel";
 import type { SelectedPoint, QueryResponse } from "@/types";
+
+const LOADING_STAGES = [
+  "Searching satellite imagery...",
+  "Retrieving satellite tile...",
+  "Running AI analysis...",
+  "Preparing results...",
+];
+
+const STAGE_INTERVAL_MS = 1800;
+
+/**
+ * The backend responds with a single JSON payload, not a progress stream, so
+ * this can't reflect the server's actual stage. It cycles through plausible
+ * stages but caps at the last one and never advances past it until the real
+ * response arrives -- it can undersell progress, never oversell it.
+ */
+function useLoadingStage(loading: boolean): string {
+  const [stageIndex, setStageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!loading) {
+      setStageIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setStageIndex((i) => Math.min(i + 1, LOADING_STAGES.length - 1));
+    }, STAGE_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  return LOADING_STAGES[stageIndex];
+}
 
 interface QueryPanelProps {
   selectedPoint: SelectedPoint | null;
@@ -20,6 +52,7 @@ export default function QueryPanel({
   onSubmit,
 }: QueryPanelProps) {
   const [question, setQuestion] = useState("");
+  const loadingStage = useLoadingStage(loading);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -71,13 +104,13 @@ export default function QueryPanel({
             {loading && (
               <div className="loading-indicator">
                 <div className="spinner" />
-                Searching satellite imagery and analyzing...
+                {loadingStage}
               </div>
             )}
 
             {error && <div className="error-msg">{error}</div>}
 
-            {result && <AnswerDisplay result={result} />}
+            {result && <AnalysisPanel result={result} />}
           </>
         )}
       </div>
