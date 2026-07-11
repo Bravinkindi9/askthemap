@@ -151,6 +151,7 @@ def test_query_vlm_failure_returns_friendly_error(mock_search, mock_fetch, mock_
 @patch("app.routers.query.fetch_image", new_callable=AsyncMock)
 @patch("app.routers.query.search_imagery", new_callable=AsyncMock)
 def test_query_missing_api_key(mock_search, mock_fetch, mock_settings):
+    mock_settings.vlm_provider = "gemini"
     mock_settings.gemini_api_key = ""
     mock_settings.max_cloud_cover = 30
     mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
@@ -162,3 +163,60 @@ def test_query_missing_api_key(mock_search, mock_fetch, mock_settings):
 
     response = client.post("/api/query", json=VALID_REQUEST)
     assert response.status_code == 503
+
+
+@patch("app.routers.query.settings")
+@patch("app.routers.query.fetch_image", new_callable=AsyncMock)
+@patch("app.routers.query.search_imagery", new_callable=AsyncMock)
+def test_query_missing_openrouter_key_not_masked_by_empty_gemini_key(
+    mock_search, mock_fetch, mock_settings
+):
+    """Regression test: the missing-key check must look at the *active*
+    provider's key, not always app_settings.gemini_api_key."""
+    mock_settings.vlm_provider = "openrouter"
+    mock_settings.gemini_api_key = ""
+    mock_settings.openrouter_api_key = ""
+    mock_settings.max_cloud_cover = 30
+    mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
+    mock_settings.stac_timeout_s = 10.0
+    mock_settings.image_size_px = 512
+    mock_settings.image_fetch_timeout_s = 15.0
+    mock_search.return_value = SEARCH_RESULT
+    mock_fetch.return_value = Image.new("RGB", (512, 512))
+
+    response = client.post("/api/query", json=VALID_REQUEST)
+    assert response.status_code == 503
+    assert "openrouter" in response.json()["detail"]
+
+
+@patch("app.routers.query.settings")
+@patch("app.routers.query.get_vlm")
+@patch("app.routers.query.fetch_image", new_callable=AsyncMock)
+@patch("app.routers.query.search_imagery", new_callable=AsyncMock)
+def test_query_openrouter_configured_is_not_blocked_by_empty_gemini_key(
+    mock_search, mock_fetch, mock_get_vlm, mock_settings
+):
+    """A configured OpenRouter key must not be rejected just because
+    gemini_api_key happens to be empty."""
+    mock_settings.vlm_provider = "openrouter"
+    mock_settings.gemini_api_key = ""
+    mock_settings.openrouter_api_key = "or-test-key"
+    mock_settings.max_cloud_cover = 30
+    mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
+    mock_settings.stac_timeout_s = 10.0
+    mock_settings.image_size_px = 512
+    mock_settings.image_fetch_timeout_s = 15.0
+    mock_settings.vlm_timeout_s = 30.0
+    mock_search.return_value = SEARCH_RESULT
+    mock_fetch.return_value = Image.new("RGB", (512, 512))
+
+    mock_vlm = MagicMock()
+    mock_vlm.ask = AsyncMock(
+        return_value=AnalysisResult(
+            summary="Farmland", detail="Fields visible.", confidence=Confidence.medium
+        )
+    )
+    mock_get_vlm.return_value = mock_vlm
+
+    response = client.post("/api/query", json=VALID_REQUEST)
+    assert response.status_code == 200

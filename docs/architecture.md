@@ -50,10 +50,19 @@ User (Browser)
 - `schemas.py` — `AnalysisResult` (summary, detail, confidence, caveats, supporting
   evidence) and `Confidence` (low/medium/high). Owned by the VLM layer, not the API
   layer, so it stays meaningful independent of how the API exposes it.
+- `prompts.py` — the shared analyst prompt used by every provider, so the
+  instructions given to the model can't drift between implementations
 - `gemini.py` — Google Gemini implementation using structured JSON output
   (`response_schema=AnalysisResult`), so the model's response is validated into
   the schema directly rather than parsed from free text
-- Swap providers by adding a new implementation and changing the factory in `__init__.py`
+- `openrouter.py` — OpenRouter implementation (OpenAI-compatible API), giving free
+  access to open vision-language models (default: `qwen/qwen2.5-vl-7b-instruct:free`).
+  Uses a hand-written JSON schema for `response_format` plus a prompt-level shape
+  hint and code-fence stripping, since open models honor strict schema mode less
+  reliably than Gemini's native support (see ADR 008)
+- The active provider is selected by `ATM_VLM_PROVIDER` and returned by the
+  `get_vlm()` factory in `__init__.py` — switching providers is a config change
+  only; `query.py`, `models.py`, and the frontend are unaffected
 
 ## Data Flow for a Query
 

@@ -82,10 +82,15 @@ async def ask_about_location(req: QueryRequest):
         error_detail="We found imagery for this location but couldn't download it. Please try again.",
     )
 
-    if not settings.gemini_api_key:
+    active_api_key = (
+        settings.openrouter_api_key
+        if settings.vlm_provider == "openrouter"
+        else settings.gemini_api_key
+    )
+    if not active_api_key:
         raise HTTPException(
             status_code=503,
-            detail="VLM API key not configured. Set ATM_GEMINI_API_KEY.",
+            detail=f"VLM API key not configured for provider '{settings.vlm_provider}'.",
         )
 
     vlm = get_vlm()

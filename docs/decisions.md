@@ -123,3 +123,47 @@ this cost is highly network-dependent.
 
 Date:
 July 2026
+
+## ADR 008: OpenRouter as a second VLM provider
+
+Decision:
+Add `OpenRouterVLM` implementing `BaseVLM`, alongside (not replacing) `GeminiVLM`.
+The active provider is selected by `ATM_VLM_PROVIDER` (`gemini` | `openrouter`) and
+returned by the existing `get_vlm()` factory — no changes to `query.py`, `models.py`,
+or the frontend were needed, since both providers satisfy the same
+`ask(image, question, lat, lon) -> AnalysisResult` contract established in ADR 006.
+Default model is `qwen/qwen2.5-vl-7b-instruct:free`, configurable via
+`ATM_OPENROUTER_MODEL` without a code change.
+
+Reason:
+Gemini's free tier turned out to have zero usable quota on the development
+account (`limit: 0` on every metric — an account/billing-eligibility condition on
+Google's side, confirmed via multiple real calls, not a bug in this codebase).
+Rather than blocking development on that, or committing to paid Gemini usage,
+`BaseVLM` (ADR 003) already existed specifically to make this kind of swap cheap.
+OpenRouter was chosen over Hugging Face Inference Providers/Serverless because it's
+genuinely free indefinitely (not a depletable trial-credit pool), requires no card,
+and — being an OpenAI-compatible aggregator over several free vision models
+(Qwen2.5-VL, InternVL3, others) — gives provider flexibility within a single
+integration, which is the actual goal (not depending on any one commercial vendor).
+
+Two implementation notes worth recording:
+- The wire-format JSON schema sent to OpenRouter is hand-written (`app/vlm/openrouter.py`),
+  not derived from `AnalysisResult.model_json_schema()`. The derived schema uses
+  `$defs`/`$ref` for the `Confidence` enum and leaves two fields optional, which
+  strict `response_format` schema modes on third-party/open models handle
+  inconsistently. The hand-written schema is flat and fully-required; Pydantic
+  still performs the real validation on the parsed response either way.
+- Open models are less reliable than Gemini's native `response_schema` at honoring
+  structured output, so the required JSON shape is also reinforced directly in the
+  prompt, and markdown code-fence wrapping (a common failure mode) is stripped
+  before parsing. Query-pipeline error handling (ADR 007) already turns any
+  remaining parse/validation failure into a clean, user-safe error — no
+  provider-specific retry logic was added preemptively without evidence it's needed.
+
+The prompt content itself (the analyst framing, confidence/caveat/evidence
+instructions) was extracted from `gemini.py` into `app/vlm/prompts.py` so both
+providers share one copy instead of two that could drift.
+
+Date:
+July 2026

@@ -2,8 +2,15 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    # Which BaseVLM implementation get_vlm() returns. "gemini" or "openrouter".
+    vlm_provider: str = "gemini"
+
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
+
+    openrouter_api_key: str = ""
+    openrouter_model: str = "qwen/qwen2.5-vl-7b-instruct:free"
+
     cors_origins: list[str] = ["http://localhost:3000"]
     max_cloud_cover: int = 30
     image_size_px: int = 512

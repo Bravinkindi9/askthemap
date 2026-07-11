@@ -20,6 +20,23 @@ cp .env.example .env
 # Edit .env and set ATM_GEMINI_API_KEY
 ```
 
+### Switching VLM providers
+
+`get_vlm()` (`app/vlm/__init__.py`) returns whichever provider `ATM_VLM_PROVIDER` selects —
+switching is a config change only, nothing else in the codebase (routes, models,
+frontend) needs to change:
+
+```bash
+ATM_VLM_PROVIDER=gemini       # default — needs ATM_GEMINI_API_KEY
+ATM_VLM_PROVIDER=openrouter   # needs ATM_OPENROUTER_API_KEY
+```
+
+OpenRouter gives free access to several open vision-language models (no card
+required) — get a key at [openrouter.ai/keys](https://openrouter.ai/keys) and
+set `ATM_OPENROUTER_MODEL` to any vision-capable `:free` model slug (defaults to
+`qwen/qwen2.5-vl-7b-instruct:free`). To add another provider later, implement
+`BaseVLM` in `app/vlm/` and add one branch to `get_vlm()`.
+
 ## Run
 
 ```bash
