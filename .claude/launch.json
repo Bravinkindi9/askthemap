@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "apps/api/venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "app.main:app", "--app-dir", "apps/api", "--port", "8010"],
+      "port": 8010
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "apps/web", "--", "-p", "3001"],
+      "port": 3001
+    },
+    {
+      "name": "webigames-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "C:/Users/USER/Desktop/Webigames/apps/web", "--", "-p", "3002"],
+      "port": 3002
+    }
+  ]
+}

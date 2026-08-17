@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import PlaceSearch from "@/components/PlaceSearch";
 import QueryPanel from "@/components/QueryPanel";
 import type { SelectedPoint, QueryResponse } from "@/types";
 import { queryLocation } from "@/lib/api";
@@ -46,6 +47,7 @@ export default function Home() {
   return (
     <div className="app-container">
       <div className="map-container">
+        <PlaceSearch onPlaceSelected={handlePointSelected} />
         <MapView
           selectedPoint={selectedPoint}
           onPointSelected={handlePointSelected}

@@ -13,6 +13,7 @@ from geo import fetch_image, search_imagery
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+query_semaphore = asyncio.Semaphore(settings.query_concurrency_limit)
 
 T = TypeVar("T")
 
@@ -48,6 +49,12 @@ async def _run_stage(
 
 @router.post("/api/query", response_model=QueryResponse)
 async def ask_about_location(req: QueryRequest):
+    if settings.vlm_provider not in {"gemini", "openrouter"}:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unsupported VLM provider '{settings.vlm_provider}'.",
+        )
+
     result = await _run_stage(
         search_imagery(
             lat=req.lat,
@@ -68,19 +75,20 @@ async def ask_about_location(req: QueryRequest):
             "location. Try a nearby point or check back later.",
         )
 
-    image = await _run_stage(
-        fetch_image(
-            asset_href=result["asset_href"],
-            lat=req.lat,
-            lon=req.lon,
-            size_px=settings.image_size_px,
+    async with query_semaphore:
+        image = await _run_stage(
+            fetch_image(
+                asset_href=result["asset_href"],
+                lat=req.lat,
+                lon=req.lon,
+                size_px=settings.image_size_px,
+                timeout_s=settings.image_fetch_timeout_s,
+            ),
+            stage="image_fetch",
             timeout_s=settings.image_fetch_timeout_s,
-        ),
-        stage="image_fetch",
-        timeout_s=settings.image_fetch_timeout_s,
-        timeout_detail="Downloading the satellite image took too long. Please try again.",
-        error_detail="We found imagery for this location but couldn't download it. Please try again.",
-    )
+            timeout_detail="Downloading the satellite image took too long. Please try again.",
+            error_detail="We found imagery for this location but couldn't download it. Please try again.",
+        )
 
     active_api_key = (
         settings.openrouter_api_key
@@ -112,10 +120,11 @@ async def ask_about_location(req: QueryRequest):
         question=req.question,
         analysis=analysis,
         image_metadata=ImageMetadata(
+            item_id=result["id"],
             datetime=result["datetime"],
             cloud_cover=result.get("cloud_cover"),
             collection=result["collection"],
-            asset_href=result["asset_href"],
+            source="Microsoft Planetary Computer",
             platform=result.get("platform"),
             instrument=result.get("instrument"),
             resolution_m=result.get("resolution_m"),

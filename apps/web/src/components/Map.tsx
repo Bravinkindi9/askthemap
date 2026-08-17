@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { SelectedPoint } from "@/types";
 
@@ -32,6 +33,20 @@ function ClickHandler({
   return null;
 }
 
+function Recenter({ selectedPoint }: { selectedPoint: SelectedPoint | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (selectedPoint) {
+      map.flyTo([selectedPoint.lat, selectedPoint.lon], Math.max(map.getZoom(), 12), {
+        duration: 0.8,
+      });
+    }
+  }, [map, selectedPoint]);
+
+  return null;
+}
+
 export default function MapView({ selectedPoint, onPointSelected }: MapProps) {
   return (
     <MapContainer
@@ -45,6 +60,7 @@ export default function MapView({ selectedPoint, onPointSelected }: MapProps) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ClickHandler onPointSelected={onPointSelected} />
+      <Recenter selectedPoint={selectedPoint} />
       {selectedPoint && (
         <Marker position={[selectedPoint.lat, selectedPoint.lon]} />
       )}

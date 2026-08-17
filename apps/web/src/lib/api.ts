@@ -1,4 +1,4 @@
-import { QueryRequest, QueryResponse } from "@/types";
+import { PlaceResult, QueryRequest, QueryResponse } from "@/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -11,6 +11,18 @@ export async function queryLocation(req: QueryRequest): Promise<QueryResponse> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Request failed" }));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+
+  return res.json();
+}
+
+export async function searchPlaces(query: string): Promise<PlaceResult[]> {
+  const params = new URLSearchParams({ q: query });
+  const res = await fetch(`${API_BASE}/api/places/search?${params.toString()}`);
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Search failed" }));
     throw new Error(err.detail || `HTTP ${res.status}`);
   }
 

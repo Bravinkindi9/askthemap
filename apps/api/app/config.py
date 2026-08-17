@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     vlm_provider: str = "gemini"
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-2.5-flash"
 
     openrouter_api_key: str = ""
     openrouter_model: str = "qwen/qwen2.5-vl-7b-instruct:free"
@@ -28,6 +28,17 @@ class Settings(BaseSettings):
     stac_timeout_s: float = 20.0
     image_fetch_timeout_s: float = 45.0
     vlm_timeout_s: float = 30.0
+    max_request_body_bytes: int = 8_192
+    rate_limit_requests: int = 30
+    rate_limit_window_s: float = 60.0
+    query_concurrency_limit: int = 2
+
+    place_search_provider: str = "nominatim"
+    place_search_url: str = "https://nominatim.openstreetmap.org/search"
+    place_search_user_agent: str = "AskioV1/0.1 (personal portfolio project)"
+    place_search_timeout_s: float = 8.0
+    place_search_min_interval_s: float = 1.0
+    place_search_cache_ttl_s: float = 86400.0
 
     model_config = {"env_file": ".env", "env_prefix": "ATM_"}
 

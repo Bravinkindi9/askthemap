@@ -7,4 +7,6 @@ from .openrouter import OpenRouterVLM
 def get_vlm() -> BaseVLM:
     if settings.vlm_provider == "openrouter":
         return OpenRouterVLM()
-    return GeminiVLM()
+    if settings.vlm_provider == "gemini":
+        return GeminiVLM()
+    raise ValueError(f"Unsupported VLM provider '{settings.vlm_provider}'. Use 'gemini' or 'openrouter'.")

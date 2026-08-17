@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.models import QueryRequest, QueryResponse, ImageMetadata
+from app.models import ImageMetadata, PlaceResult, QueryRequest, QueryResponse
 from app.vlm.schemas import AnalysisResult, Confidence
 
 
@@ -45,10 +45,11 @@ def test_query_response():
             supporting_evidence=["Grid-like street pattern", "Rooftop clusters"],
         ),
         image_metadata=ImageMetadata(
+            item_id="S2A_TEST_ITEM",
             datetime="2026-06-12T08:00:00Z",
             cloud_cover=15.0,
             collection="sentinel-2-l2a",
-            asset_href="https://example.com/image.tif",
+            source="Microsoft Planetary Computer",
             platform="Sentinel-2B",
             instrument="msi",
             resolution_m=10.0,
@@ -59,6 +60,7 @@ def test_query_response():
     assert resp.analysis.confidence == Confidence.high
     assert resp.image_metadata.cloud_cover == 15.0
     assert resp.image_metadata.platform == "Sentinel-2B"
+    assert resp.image_metadata.source == "Microsoft Planetary Computer"
     assert resp.image_base64 == "iVBORw0KGgo="
 
 
@@ -71,3 +73,15 @@ def test_query_response_requires_image_metadata():
             analysis=AnalysisResult(summary="s", detail="d", confidence=Confidence.low),
             image_base64="",
         )
+
+
+def test_place_result_valid():
+    result = PlaceResult(
+        name="Kigali",
+        display_name="Kigali, Rwanda",
+        latitude=-1.9441,
+        longitude=30.0619,
+        type="city",
+        bounding_box=[-2.1, -1.8, 29.9, 30.2],
+    )
+    assert result.name == "Kigali"

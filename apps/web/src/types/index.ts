@@ -1,6 +1,7 @@
 export interface SelectedPoint {
   lat: number;
   lon: number;
+  label?: string;
 }
 
 export interface QueryRequest {
@@ -20,10 +21,11 @@ export interface AnalysisResult {
 }
 
 export interface ImageMetadata {
+  item_id: string;
   datetime: string;
   cloud_cover: number | null;
   collection: string;
-  asset_href: string;
+  source: string;
   platform: string | null;
   instrument: string | null;
   resolution_m: number | null;
@@ -36,4 +38,13 @@ export interface QueryResponse {
   analysis: AnalysisResult;
   image_metadata: ImageMetadata;
   image_base64: string;
+}
+
+export interface PlaceResult {
+  name: string;
+  display_name: string;
+  latitude: number;
+  longitude: number;
+  type: string;
+  bounding_box: number[] | null;
 }

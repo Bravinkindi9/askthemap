@@ -43,6 +43,7 @@ def _search_sync(
     instruments = item.properties.get("instruments") or []
 
     return {
+        "id": item.id,
         "datetime": item.properties.get("datetime", ""),
         "cloud_cover": item.properties.get("eo:cloud_cover"),
         "collection": "sentinel-2-l2a",

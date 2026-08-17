@@ -13,6 +13,7 @@ client = TestClient(app)
 VALID_REQUEST = {"lat": -1.9403, "lon": 29.8739, "question": "What is here?"}
 
 SEARCH_RESULT = {
+    "id": "S2B_TEST_ITEM",
     "datetime": "2026-06-12T08:00:00Z",
     "cloud_cover": 10.0,
     "collection": "sentinel-2-l2a",
@@ -70,6 +71,10 @@ def test_query_success(mock_search, mock_fetch, mock_get_vlm, mock_settings):
     assert data["analysis"]["confidence"] == "high"
     assert data["lat"] == -1.9403
     assert data["image_metadata"]["collection"] == "sentinel-2-l2a"
+    assert data["image_metadata"]["source"] == "Microsoft Planetary Computer"
+    assert data["image_metadata"]["item_id"] == "S2B_TEST_ITEM"
+    assert "asset_href" not in data["image_metadata"]
+    assert "sig=" not in str(data)
     assert data["image_metadata"]["platform"] == "Sentinel-2B"
     assert len(data["image_base64"]) > 0
 
@@ -163,6 +168,16 @@ def test_query_missing_api_key(mock_search, mock_fetch, mock_settings):
 
     response = client.post("/api/query", json=VALID_REQUEST)
     assert response.status_code == 503
+
+
+@patch("app.routers.query.settings")
+@patch("app.routers.query.search_imagery", new_callable=AsyncMock)
+def test_query_invalid_provider_fails_clearly(mock_search, mock_settings):
+    mock_settings.vlm_provider = "mystery"
+    response = client.post("/api/query", json=VALID_REQUEST)
+    assert response.status_code == 500
+    assert "Unsupported VLM provider" in response.json()["detail"]
+    mock_search.assert_not_called()
 
 
 @patch("app.routers.query.settings")

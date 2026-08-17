@@ -26,7 +26,8 @@ export default function SatelliteImagePreview({
         {metadata.cloud_cover != null && (
           <span>Cloud cover: {metadata.cloud_cover.toFixed(1)}%</span>
         )}
-        <span>Source: {metadata.collection}</span>
+        <span>Source: {metadata.source}</span>
+        <span>Item: {metadata.item_id}</span>
       </div>
     </div>
   );

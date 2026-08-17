@@ -77,7 +77,7 @@ export default function QueryPanel({
         ) : (
           <>
             <div className="coordinates">
-              Location:{" "}
+              {selectedPoint.label ? `${selectedPoint.label}: ` : "Location: "}
               <span>
                 {selectedPoint.lat.toFixed(4)}, {selectedPoint.lon.toFixed(4)}
               </span>
