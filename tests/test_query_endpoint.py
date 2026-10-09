@@ -42,6 +42,7 @@ def test_query_no_imagery(mock_search):
 @patch("app.routers.query.fetch_image", new_callable=AsyncMock)
 @patch("app.routers.query.search_imagery", new_callable=AsyncMock)
 def test_query_success(mock_search, mock_fetch, mock_get_vlm, mock_settings):
+    mock_settings.vlm_provider = "gemini"
     mock_settings.gemini_api_key = "test-key"
     mock_settings.max_cloud_cover = 30
     mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
@@ -82,6 +83,7 @@ def test_query_success(mock_search, mock_fetch, mock_get_vlm, mock_settings):
 @patch("app.routers.query.settings")
 @patch("app.routers.query.search_imagery", new_callable=AsyncMock)
 def test_query_stac_timeout_returns_friendly_error(mock_search, mock_settings):
+    mock_settings.vlm_provider = "gemini"
     mock_settings.max_cloud_cover = 30
     mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
     mock_settings.stac_timeout_s = 10.0
@@ -95,6 +97,7 @@ def test_query_stac_timeout_returns_friendly_error(mock_search, mock_settings):
 @patch("app.routers.query.settings")
 @patch("app.routers.query.search_imagery", new_callable=AsyncMock)
 def test_query_stac_failure_does_not_leak_exception_detail(mock_search, mock_settings):
+    mock_settings.vlm_provider = "gemini"
     mock_settings.max_cloud_cover = 30
     mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
     mock_settings.stac_timeout_s = 10.0
@@ -111,6 +114,7 @@ def test_query_stac_failure_does_not_leak_exception_detail(mock_search, mock_set
 @patch("app.routers.query.fetch_image", new_callable=AsyncMock)
 @patch("app.routers.query.search_imagery", new_callable=AsyncMock)
 def test_query_image_fetch_failure_returns_friendly_error(mock_search, mock_fetch, mock_settings):
+    mock_settings.vlm_provider = "gemini"
     mock_settings.max_cloud_cover = 30
     mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"
     mock_settings.stac_timeout_s = 10.0
@@ -131,6 +135,7 @@ def test_query_image_fetch_failure_returns_friendly_error(mock_search, mock_fetc
 @patch("app.routers.query.fetch_image", new_callable=AsyncMock)
 @patch("app.routers.query.search_imagery", new_callable=AsyncMock)
 def test_query_vlm_failure_returns_friendly_error(mock_search, mock_fetch, mock_get_vlm, mock_settings):
+    mock_settings.vlm_provider = "gemini"
     mock_settings.gemini_api_key = "test-key"
     mock_settings.max_cloud_cover = 30
     mock_settings.stac_api_url = "https://planetarycomputer.microsoft.com/api/stac/v1"

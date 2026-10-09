@@ -2,14 +2,18 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Which BaseVLM implementation get_vlm() returns. "gemini" or "openrouter".
+    # Which BaseVLM/BaseTextLLM implementation to use. "gemini" or "openrouter".
     vlm_provider: str = "gemini"
 
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.5-flash"
+    # Text-only model for geographic questions (same provider, same key)
+    text_model_gemini: str = "gemini-2.5-flash"
 
     openrouter_api_key: str = ""
     openrouter_model: str = "qwen/qwen2.5-vl-7b-instruct:free"
+    # Text-only model for geographic questions (free tier, better at instruction-following)
+    text_model_openrouter: str = "qwen/qwen2.5-72b-instruct:free"
 
     cors_origins: list[str] = ["http://localhost:3000"]
     max_cloud_cover: int = 30
@@ -39,6 +43,11 @@ class Settings(BaseSettings):
     place_search_timeout_s: float = 8.0
     place_search_min_interval_s: float = 1.0
     place_search_cache_ttl_s: float = 86400.0
+
+    overpass_api_url: str = "https://overpass-api.de/api/interpreter"
+    overpass_timeout_s: float = 25.0
+    overpass_radius_m: int = 500
+    overpass_cache_ttl_s: float = 900.0
 
     model_config = {"env_file": ".env", "env_prefix": "ATM_"}
 

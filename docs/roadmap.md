@@ -23,6 +23,18 @@
 - [x] Staged loading feedback in the UI (capped, never overclaims progress)
 - [ ] Deployment path (Dockerfile, prod ASGI config, per-environment CORS)
 
+## V2 — Milestone 2: Free, Evidence-First Answers
+
+- [x] Nearby mapped-feature counts from OpenStreetMap Overpass, with a bounded
+  radius, cache, and visible evidence in the chat
+- [x] Return Sentinel-2 imagery and acquisition metadata without requiring a
+  hosted AI key; state clearly when image interpretation is unavailable
+- [ ] Add reproducible satellite measurements (begin with NDVI and pixel-quality
+  metadata) before using an optional vision model to explain them
+- [ ] Make unsupported questions explicit and offer the evidence-backed
+  question types Askio can answer
+- [ ] Document public-service usage limits and keep caching/concurrency bounded
+
 ## Future Considerations
 
 - Backend-driven progress streaming (replace the simulated staged loading with
