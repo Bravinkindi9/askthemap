@@ -53,7 +53,7 @@ def test_place_search_endpoint(mock_search):
 
 @patch("app.places.settings")
 @patch("app.places.httpx.AsyncClient")
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_search_place_uses_identifying_user_agent(mock_client_cls, mock_settings):
     from app.places import _cache, search_place
 

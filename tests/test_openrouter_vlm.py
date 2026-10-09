@@ -34,7 +34,7 @@ def test_strip_code_fence_leaves_plain_json_untouched():
     assert _strip_code_fence(plain) == plain
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("app.vlm.openrouter.settings")
 async def test_ask_parses_clean_json_response(mock_settings):
     mock_settings.openrouter_api_key = "test-key"
@@ -67,7 +67,7 @@ async def test_ask_parses_clean_json_response(mock_settings):
     assert content_blocks[1]["image_url"]["url"].startswith("data:image/png;base64,")
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("app.vlm.openrouter.settings")
 async def test_ask_parses_code_fence_wrapped_response(mock_settings):
     mock_settings.openrouter_api_key = "test-key"
@@ -92,7 +92,7 @@ async def test_ask_parses_code_fence_wrapped_response(mock_settings):
     assert result.confidence == Confidence.high
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("app.vlm.openrouter.settings")
 async def test_ask_raises_on_malformed_response(mock_settings):
     mock_settings.openrouter_api_key = "test-key"

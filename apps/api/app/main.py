@@ -3,6 +3,7 @@ import time
 from collections import defaultdict, deque
 from pathlib import Path
 
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "packages"))
 
 from fastapi import FastAPI, Request
@@ -10,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.routers import places, query
+from app.routers import chat, places, query
 
 app = FastAPI(title="AskTheMap API", version="0.1.0")
 rate_limit_buckets: dict[str, deque[float]] = defaultdict(deque)
@@ -24,6 +25,7 @@ app.add_middleware(
 
 app.include_router(query.router)
 app.include_router(places.router)
+app.include_router(chat.router)
 
 
 @app.middleware("http")

@@ -48,3 +48,40 @@ export interface PlaceResult {
   type: string;
   bounding_box: number[] | null;
 }
+
+// ---------------------------------------------------------------------------
+// Conversational map types (Phase 1) — mirror app/models.py
+// ---------------------------------------------------------------------------
+
+export interface LocationContext {
+  lat: number;
+  lon: number;
+  label?: string;
+  zoom?: number;
+}
+
+export interface ChatTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface MapAction {
+  type: "zoom_to" | "pan_to";
+  lat: number;
+  lon: number;
+  zoom?: number;
+}
+
+export interface ChatResponse {
+  reply: string;
+  sources: string[];
+  evidence: string[];
+  image_metadata?: ImageMetadata;
+  image_base64?: string;
+  map_action?: MapAction;
+}
+
+/** A message in the frontend conversation thread. */
+export type Message =
+  | { role: "user"; content: string }
+  | { role: "assistant"; content: string; response: ChatResponse };

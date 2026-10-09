@@ -1,23 +1,24 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import type { SelectedPoint } from "@/types";
+import type { MapAction, SelectedPoint } from "@/types";
 
-/* Fix Leaflet's default marker icon paths broken by bundlers */
+/* Fix Leaflet default marker icon paths broken by bundlers.
+   Icons are served from public/leaflet/ — no external CDN dependency. */
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+  iconUrl: "/leaflet/marker-icon.png",
+  shadowUrl: "/leaflet/marker-shadow.png",
 });
 
 interface MapProps {
   selectedPoint: SelectedPoint | null;
   onPointSelected: (point: SelectedPoint) => void;
+  onMapReady?: (executeAction: (action: MapAction) => void) => void;
 }
 
 function ClickHandler({
@@ -47,7 +48,28 @@ function Recenter({ selectedPoint }: { selectedPoint: SelectedPoint | null }) {
   return null;
 }
 
-export default function MapView({ selectedPoint, onPointSelected }: MapProps) {
+/** Exposes a map action executor to the parent via onMapReady callback. */
+function MapActionExecutor({
+  onMapReady,
+}: {
+  onMapReady?: (fn: (action: MapAction) => void) => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!onMapReady) return;
+    onMapReady((action: MapAction) => {
+      if (action.type === "zoom_to" || action.type === "pan_to") {
+        const zoom = action.zoom ?? map.getZoom();
+        map.flyTo([action.lat, action.lon], zoom, { duration: 1.0 });
+      }
+    });
+  }, [map, onMapReady]);
+
+  return null;
+}
+
+export default function MapView({ selectedPoint, onPointSelected, onMapReady }: MapProps) {
   return (
     <MapContainer
       center={[0, 20]}
@@ -61,6 +83,7 @@ export default function MapView({ selectedPoint, onPointSelected }: MapProps) {
       />
       <ClickHandler onPointSelected={onPointSelected} />
       <Recenter selectedPoint={selectedPoint} />
+      <MapActionExecutor onMapReady={onMapReady} />
       {selectedPoint && (
         <Marker position={[selectedPoint.lat, selectedPoint.lon]} />
       )}
