@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     # Text-only model for geographic questions (free tier, better at instruction-following)
     text_model_openrouter: str = "qwen/qwen2.5-72b-instruct:free"
 
-    cors_origins: list[str] = ["http://localhost:3000"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     max_cloud_cover: int = 30
     image_size_px: int = 512
     stac_api_url: str = "https://planetarycomputer.microsoft.com/api/stac/v1"
